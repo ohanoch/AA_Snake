@@ -59,6 +59,20 @@ public class Snake {
     public int getAllMaxLength(){return allMaxLength;}
     public int getBestSnake(){return bestSnake;}
 
-
+    public String getDirection(){
+        if (body.get(0).getX() == body.get(1).getX()){
+            if (body.get(0).getY() > body.get(1).getY()){
+                return "up";
+            } else {
+                return "down";
+            }
+        } else {
+            if (body.get(0).getX() > body.get(1).getX()){
+                return "right";
+            } else {
+                return "left";
+            }
+        }
+    }
 
 }
