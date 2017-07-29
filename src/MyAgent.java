@@ -28,15 +28,17 @@ public class MyAgent extends DevelopmentAgent {
                 }
                 String apple1 = line;
                 String apple2 = br.readLine();
-                //do stuff with apples
-                for (int i = 0; i < 3; i++) {
-                    String zombie = br.readLine();
-                }
                 int mySnakeNum = Integer.parseInt(br.readLine());
+                String[] enemySnakeData = new String[nSnakes-1];
+                String mySnakeData;
                 for (int i = 0; i < nSnakes; i++) {
-                    String snakeLine = br.readLine();
                     if (i == mySnakeNum) {
-                        //hey! That's me :)
+                        mySnakeData = br.readLine();
+                    } else {
+                        if (i<mySnakeNum){
+                            enemySnakeData[i] = br.readLine();
+                        }else
+                            enemySnakeData[i-1] = br.readLine();
                     }
                     //do stuff with snakes
                 }
