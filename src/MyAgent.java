@@ -31,14 +31,19 @@ public class MyAgent extends DevelopmentAgent {
                 int mySnakeNum = Integer.parseInt(br.readLine());
                 String[] enemySnakeData = new String[nSnakes-1];
                 String mySnakeData;
+                Snake mySnake;
+                Snake[] enemySnakes = new Snake[nSnakes-1];
                 for (int i = 0; i < nSnakes; i++) {
                     if (i == mySnakeNum) {
                         mySnakeData = br.readLine();
+                        mySnake = new Snake(mySnakeNum, mySnakeData.split(" "));
                     } else {
                         if (i<mySnakeNum){
                             enemySnakeData[i] = br.readLine();
+                            enemySnakes[i]= new Snake(i, enemySnakeData[i].split(" "));
                         }else
                             enemySnakeData[i-1] = br.readLine();
+                            enemySnakes[i-1]= new Snake(i, enemySnakeData[i].split(" "));
                     }
                     //do stuff with snakes
                 }
