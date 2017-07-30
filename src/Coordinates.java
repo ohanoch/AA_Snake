@@ -21,4 +21,8 @@ public class Coordinates {
         }
         return false;
     }
+
+    public int distance(Coordinates coord2){
+        return Math.abs(this.x - coord2.getX())+Math.abs(this.y + coord2.getY());
+    }
 }

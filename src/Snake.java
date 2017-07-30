@@ -9,8 +9,8 @@ public class Snake {
     private int length;
     private int kills;
     private int maxLength;
-    private static int allMaxLength;
-    private static int bestSnake;
+    public static int allMaxLength;
+    public static int bestSnake;
 
     public Snake (int snakeNumber, String[] snakeData){
         this.snakeNumber = snakeNumber;
@@ -39,6 +39,10 @@ public class Snake {
         for (int i=0; i<body.length; i++){
             Coordinates part = new Coordinates(Integer.parseInt(body[i].split(",")[0]),Integer.parseInt(body[i].split(",")[1]));
             (this.body).addLast(part);
+            if (i==0){
+                Map.grid[part.getX()][part.getY()]='H';
+            }
+            Map.grid[part.getX()][part.getY()]='B';
         }
     }
     public void setState(String state){this.state=state;}
@@ -59,6 +63,7 @@ public class Snake {
     public int getAllMaxLength(){return allMaxLength;}
     public int getBestSnake(){return bestSnake;}
 
+    public Coordinates getHead(){return this.body.get(0);}
     public String getDirection(){
         if (body.get(0).getX() == body.get(1).getX()){
             if (body.get(0).getY() > body.get(1).getY()){
