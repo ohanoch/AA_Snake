@@ -82,7 +82,8 @@ public class MyAgent extends DevelopmentAgent {
                                 if (mySnake.getLength()+5 < mySnake.getMaxLength()){
                                     //kamikaza first place if you aren't close to your max
                                 } else {
-                                    // if you are close to your max go towards the mid-ring
+                                    // if you are close to your max go towards the mid-ring 13-37
+
                                 }
                     }
                 }
