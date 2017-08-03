@@ -12,8 +12,8 @@ public class Coordinates {
 
     public int getX(){ return x; }
     public int getY(){ return y; }
-    public void setL(int x){ this.x = x; }
-    public void setR(int y){ this.y = y; }
+    public void setX(int x){ this.x = x; }
+    public void setY(int y){ this.y = y; }
 
     public boolean equals(Coordinates coord2){
         if (this.x == coord2.getX() && this.y == coord2.getY()){

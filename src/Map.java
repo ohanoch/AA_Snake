@@ -2,8 +2,8 @@
  * Created by or on 7/29/17.
  */
 public class Map {
-    private int gridWidth;
-    private int gridHeight;
+    public static int gridWidth;
+    public static int gridHeight;
     public static char[][] grid;
 
     public Map(int gridWidth, int gridHeight){
