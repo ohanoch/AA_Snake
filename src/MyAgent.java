@@ -6,6 +6,7 @@ import za.ac.wits.snake.DevelopmentAgent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Random;
 
 public class MyAgent extends DevelopmentAgent {
@@ -28,6 +29,8 @@ public class MyAgent extends DevelopmentAgent {
             Map map= new Map(gridWidth,gridHeight);
 
             int corner = 1;
+            String[] enemySnakeDataBackup = new String[nSnakes-1];
+            boolean exisitsInvisible = false;
             while (true) {
 //                System.err.println("--------------------------------------------started while loop--------------------------------");
                 int move = -1;
@@ -74,6 +77,10 @@ public class MyAgent extends DevelopmentAgent {
                             }
                             enemySnakes[i].setSafeZone();
                             nLiveEnemySnakes++;
+
+                            if(exisitsInvisible==true && enemySnakes[i].getState().equals("invisible")){
+                                enemySnakes[i].setBody(Arrays.copyOfRange(enemySnakeDataBackup[i].split(" "), 4, enemySnakeDataBackup[i].split(" ").length));
+                            }
                         }else {
                             enemySnakeData[i - 1] = br.readLine();
                             System.err.println(enemySnakeData[i-1]);
@@ -83,6 +90,10 @@ public class MyAgent extends DevelopmentAgent {
                             }
                             enemySnakes[i-1].setSafeZone();
                             nLiveEnemySnakes++;
+
+                            if(exisitsInvisible==true && enemySnakes[i-1].getState().equals("invisible")){
+                                enemySnakes[i-1].setBody(Arrays.copyOfRange(enemySnakeDataBackup[i-1].split(" "), 4, enemySnakeDataBackup[i-1].split(" ").length));
+                            }
                         }
                     }
                 }
@@ -201,6 +212,14 @@ public class MyAgent extends DevelopmentAgent {
 //                move = new Random().nextInt(4);
                 System.out.println(move);
                 map.resetGrid();
+                if (enemySnakes[0].getState().equals("invisible") ||
+                        enemySnakes[1].getState().equals("invisible") ||
+                        enemySnakes[2].getState().equals("invisible")) {
+                    enemySnakeDataBackup = enemySnakeData;
+                    exisitsInvisible = true;
+                } else {
+                    exisitsInvisible = false;
+                }
 
                 System.err.println("time for step " + (System.currentTimeMillis()-time));
             }
