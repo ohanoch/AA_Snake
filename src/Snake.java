@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Snake {
     private int snakeNumber;
@@ -106,6 +107,9 @@ public class Snake {
         }
     }
     public void setSafeZone(){
+        if (this.getState().equals("invisible")){
+            return;
+        }
         if (this.getDirection().equals("up")){
             if(this.getHead().getY()+1 < Map.gridHeight){
                 Map.grid[this.getHead().getX()][this.getHead().getY()+1]='*';
@@ -153,19 +157,17 @@ public class Snake {
     }
     public int move(Coordinates goal){
 
-        int up = 0;
-        int down = 1;
+        int up = 1;
+        int down = 0;
         int left = 2;
         int right = 3;
-        System.err.println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
 //        Up
         if (this.getHead().getY() < goal.getY() &&
                 this.getHead().getY()+1<Map.gridHeight &&
                 (Map.grid[this.getHead().getX()][this.getHead().getY()+1]==' ' ||
                         Map.grid[this.getHead().getX()][this.getHead().getY()+1]=='A' ||
                         Map.grid[this.getHead().getX()][this.getHead().getY()+1]=='S')){
-            return 2;
-//            return 0;
+            return up;
         }
 //        Down
         if (this.getHead().getY() > goal.getY() &&
@@ -173,8 +175,7 @@ public class Snake {
                 (Map.grid[this.getHead().getX()][this.getHead().getY()-1]==' ' ||
                         Map.grid[this.getHead().getX()][this.getHead().getY()-1]=='A' ||
                         Map.grid[this.getHead().getX()][this.getHead().getY()-1]=='S')){
-            return 3;
-//            return 1;
+            return down;
         }
 //        Left
         if (this.getHead().getX() > goal.getX() &&
@@ -182,8 +183,7 @@ public class Snake {
                 (Map.grid[this.getHead().getX()-1][this.getHead().getY()]==' ' ||
                         Map.grid[this.getHead().getX()-1][this.getHead().getY()]=='A' ||
                         Map.grid[this.getHead().getX()-1][this.getHead().getY()]=='S')){
-            return 1;
-//            return 2;
+            return left;
         }
 //        Right
         if (this.getHead().getX() <= goal.getX() &&
@@ -191,43 +191,46 @@ public class Snake {
                 (Map.grid[this.getHead().getX()+1][this.getHead().getY()]==' ' ||
                         Map.grid[this.getHead().getX()+1][this.getHead().getY()]=='A' ||
                         Map.grid[this.getHead().getX()+1][this.getHead().getY()]=='S')){
-            return 0;
-//            return 3;
+            return right;
         }
-        System.err.println("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-//        Can't go towards apple
-        //        Up
-        if (this.getHead().getY()+1<Map.gridHeight &&
-                (Map.grid[this.getHead().getX()][this.getHead().getY()+1]==' ' ||
-                        Map.grid[this.getHead().getX()][this.getHead().getY()+1]=='A' ||
-                        Map.grid[this.getHead().getX()][this.getHead().getY()+1]=='S')){
-            return 2;
-//            return 0;
-        }
+
+//        Can't go towards goal
+        for (int i=0; i<20; i++){
+            int randomNum = ThreadLocalRandom.current().nextInt(0, 3 + 1);
+            //        Up
+            if (randomNum==0 &&
+                    this.getHead().getY()+1<Map.gridHeight &&
+                    (Map.grid[this.getHead().getX()][this.getHead().getY()+1]==' ' ||
+                            Map.grid[this.getHead().getX()][this.getHead().getY()+1]=='A' ||
+                            Map.grid[this.getHead().getX()][this.getHead().getY()+1]=='S')){
+                return up;
+            }
 //        Down
-        if (this.getHead().getY()-1>=0 &&
-                (Map.grid[this.getHead().getX()][this.getHead().getY()-1]==' ' ||
-                        Map.grid[this.getHead().getX()][this.getHead().getY()-1]=='A' ||
-                        Map.grid[this.getHead().getX()][this.getHead().getY()-1]=='S')){
-            return 3;
-//            return 1;
-        }
+            if (randomNum==1 &&
+                    this.getHead().getY()-1>=0 &&
+                    (Map.grid[this.getHead().getX()][this.getHead().getY()-1]==' ' ||
+                            Map.grid[this.getHead().getX()][this.getHead().getY()-1]=='A' ||
+                            Map.grid[this.getHead().getX()][this.getHead().getY()-1]=='S')){
+                return down;
+            }
 //        Left
-        if (this.getHead().getX()-1>=0 &&
-                (Map.grid[this.getHead().getX()-1][this.getHead().getY()]==' ' ||
-                        Map.grid[this.getHead().getX()-1][this.getHead().getY()]=='A' ||
-                        Map.grid[this.getHead().getX()-1][this.getHead().getY()]=='S')){
-            return 1;
-//            return 2;
-        }
+            if (randomNum==2 &&
+                    this.getHead().getX()-1>=0 &&
+                    (Map.grid[this.getHead().getX()-1][this.getHead().getY()]==' ' ||
+                            Map.grid[this.getHead().getX()-1][this.getHead().getY()]=='A' ||
+                            Map.grid[this.getHead().getX()-1][this.getHead().getY()]=='S')){
+                return left;
+            }
 //        Right
-        if (this.getHead().getX()+1<Map.gridWidth &&
-                (Map.grid[this.getHead().getX()+1][this.getHead().getY()]==' ' ||
-                        Map.grid[this.getHead().getX()+1][this.getHead().getY()]=='A' ||
-                        Map.grid[this.getHead().getX()+1][this.getHead().getY()]=='S')){
-            return 0;
-//            return 3;
+            if (randomNum==3 &&
+                    this.getHead().getX()+1<Map.gridWidth &&
+                    (Map.grid[this.getHead().getX()+1][this.getHead().getY()]==' ' ||
+                            Map.grid[this.getHead().getX()+1][this.getHead().getY()]=='A' ||
+                            Map.grid[this.getHead().getX()+1][this.getHead().getY()]=='S')){
+                return right;
+            }
         }
+
 
         return down;
     }

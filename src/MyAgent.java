@@ -26,6 +26,8 @@ public class MyAgent extends DevelopmentAgent {
             int gridWidth = Integer.parseInt(temp[1]);
             int gridHeight = Integer.parseInt(temp[2]);
             Map map= new Map(gridWidth,gridHeight);
+
+            int corner = 1;
             while (true) {
 //                System.err.println("--------------------------------------------started while loop--------------------------------");
                 int move = -1;
@@ -75,7 +77,7 @@ public class MyAgent extends DevelopmentAgent {
                         }else {
                             enemySnakeData[i - 1] = br.readLine();
                             System.err.println(enemySnakeData[i-1]);
-                            enemySnakes[i - 1] = new Snake(i, enemySnakeData[i - 1].split(" "));
+                            enemySnakes[i - 1] = new Snake(i-1, enemySnakeData[i - 1].split(" "));
                             if (enemySnakes[i-1].getState().equals("dead")){
                                 continue;
                             }
@@ -84,7 +86,7 @@ public class MyAgent extends DevelopmentAgent {
                         }
                     }
                 }
-                Snake mySnake = new Snake(mySnakeNum, mySnakeData.split(" "));
+                Snake mySnake = new Snake(-1, mySnakeData.split(" "));
                 if (mySnake.getState().equals("dead")){
                     continue;
                 }
@@ -97,42 +99,110 @@ public class MyAgent extends DevelopmentAgent {
                     }
                     liveEnemySnakes[i-deadCount]=enemySnakes[i];
                 }
-                map.printMap();
-                System.err.println("----------------------------------------------------------------------------");
+//                map.printMap();
+//                System.err.println("----------------------------------------------------------------------------");
 
                 //finished reading, calculate move:
                 //System.out.println("log calculating...");
-//                int myDistanceFromSuperApple = 999;
-//                if (superApple.getX()!=-1){
-//                    myDistanceFromSuperApple = mySnake.getHead().distance(superApple);
-//                }
-//                int myDistanceFromNormalApple = mySnake.getHead().distance(normalApple);
-//                int enemyDistanceFromSuperApple=999;
-//                int enemyDistanceFromNormalApple=999;
-//                for (int i = 0; i<nLiveEnemySnakes; i++){
-//                    if (superApple.getX()!=-1 && liveEnemySnakes[i].getHead().distance(superApple)<enemyDistanceFromSuperApple){
-//                        enemyDistanceFromSuperApple=liveEnemySnakes[i].getHead().distance(superApple);
-//                    }
-//                    if (liveEnemySnakes[i].getHead().distance(normalApple)<enemyDistanceFromNormalApple){
-//                        enemyDistanceFromNormalApple=liveEnemySnakes[i].getHead().distance(normalApple);
-//                    }
-//                }
-////                System.err.println(myDistanceFromNormalApple + "   " + enemyDistanceFromNormalApple + "   " + myDistanceFromSuperApple + "   " + enemyDistanceFromSuperApple);
+                int myDistanceFromSuperApple = 999;
+                if (superApple.getX()!=-1){
+                    myDistanceFromSuperApple = mySnake.getHead().distance(superApple);
+                }
+                int myDistanceFromNormalApple = mySnake.getHead().distance(normalApple);
+                int enemyDistanceFromSuperApple=999;
+                int enemyDistanceFromNormalApple=999;
+                for (int i = 0; i<nLiveEnemySnakes; i++){
+                    if (superApple.getX()!=-1 && liveEnemySnakes[i].getHead().distance(superApple)<enemyDistanceFromSuperApple){
+                        enemyDistanceFromSuperApple=liveEnemySnakes[i].getHead().distance(superApple);
+                    }
+                    if (liveEnemySnakes[i].getHead().distance(normalApple)<enemyDistanceFromNormalApple){
+                        enemyDistanceFromNormalApple=liveEnemySnakes[i].getHead().distance(normalApple);
+                    }
+                }
+//                System.err.println(myDistanceFromNormalApple + "   " + enemyDistanceFromNormalApple + "   " + myDistanceFromSuperApple + "   " + enemyDistanceFromSuperApple);
+
+                if (myDistanceFromSuperApple < enemyDistanceFromSuperApple){
+                    move = mySnake.move(superApple);
+                } else if (myDistanceFromNormalApple < enemyDistanceFromNormalApple){
+                    move = mySnake.move(normalApple);
+                } else {
+//                    kamikaza
+//                    if (mySnake.getLength() < Snake.allMaxLength -5){
+//                        switch (enemySnakes[Snake.bestSnake].getDirection()){
+//                            case "up":
+//                                if(enemySnakes[Snake.bestSnake].getHead().getY()+1 < gridHeight) {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX(), enemySnakes[Snake.bestSnake].getHead().getY() + 1));
+//                                } else if (enemySnakes[Snake.bestSnake].getHead().getX()+1 < gridWidth){
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX()+1, enemySnakes[Snake.bestSnake].getHead().getY()));
+//                                } else {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX()-1, enemySnakes[Snake.bestSnake].getHead().getY()));
+//                                }
+//                                break;
+//                            case "down":
+//                                if(enemySnakes[Snake.bestSnake].getHead().getY()-1 >= 0) {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX(), enemySnakes[Snake.bestSnake].getHead().getY() - 1));
+//                                } else if (enemySnakes[Snake.bestSnake].getHead().getX()+1 < gridWidth){
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX()+1, enemySnakes[Snake.bestSnake].getHead().getY()));
+//                                } else {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX()-1, enemySnakes[Snake.bestSnake].getHead().getY()));
+//                                }
+//                                break;
+//                            case "left":
+//                                if(enemySnakes[Snake.bestSnake].getHead().getX()-1 >= 0) {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX()-1, enemySnakes[Snake.bestSnake].getHead().getY()));
+//                                } else if (enemySnakes[Snake.bestSnake].getHead().getY()+1 < gridHeight){
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX(), enemySnakes[Snake.bestSnake].getHead().getY()+1));
+//                                } else {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX(), enemySnakes[Snake.bestSnake].getHead().getY()-1));
+//                                }
+//                                break;
+//                            case "right":
+//                                if(enemySnakes[Snake.bestSnake].getHead().getX()+1 < gridWidth) {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX()+1, enemySnakes[Snake.bestSnake].getHead().getY()));
+//                                } else if (enemySnakes[Snake.bestSnake].getHead().getY()+1 < gridHeight){
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX(), enemySnakes[Snake.bestSnake].getHead().getY()+1));
+//                                } else {
+//                                    move = mySnake.move(new Coordinates(enemySnakes[Snake.bestSnake].getHead().getX(), enemySnakes[Snake.bestSnake].getHead().getY()-1));
+//                                }
+//                                break;
+//                        }
 //
-//                if (myDistanceFromSuperApple < enemyDistanceFromSuperApple){
-//                    move = mySnake.move(superApple);
-//                } else if (myDistanceFromNormalApple < enemyDistanceFromNormalApple){
-//                    move = mySnake.move(normalApple);
-//                } else {
-////                    kamikaza
-//                    move = mySnake.move(new Coordinates(25,25));
-//                }
-                move = mySnake.move(new Coordinates(25,25));
+//                    } else {
+//                        move = mySnake.move(new Coordinates(25, 25));
+//                    }
+                    switch (corner){
+                        case 1:
+                            move = mySnake.move(new Coordinates(gridWidth/4,gridHeight/4));
+                            if (mySnake.getHead().distance(new Coordinates(gridWidth/4,gridHeight/4))<=4){
+                                corner=3;
+                            }
+                            break;
+//                        case 2:
+//                            move = mySnake.move(new Coordinates(gridWidth/4,3*gridHeight/4));
+//                            if (mySnake.getHead().distance(new Coordinates(gridWidth/4,3*gridHeight/4))<=4){
+//                                corner=3;
+//                            }
+//                            break;
+                        case 3:
+                            move = mySnake.move(new Coordinates(3*gridWidth/4,3*gridHeight/4));
+                            if (mySnake.getHead().distance(new Coordinates(3*gridWidth/4,3*gridHeight/4))<=4){
+                                corner=1;
+                            }
+                            break;
+//                        case 4:
+//                            move = mySnake.move(new Coordinates(3*gridWidth/4,gridHeight/4));
+//                            if (mySnake.getHead().distance(new Coordinates(3*gridWidth/4,gridHeight/4))<=4){
+//                                corner=1;
+//                            }
+//                            break;
+                    }
+                }
+//                move = mySnake.move(new Coordinates(25,25));
 //                move = new Random().nextInt(4);
                 System.out.println(move);
                 map.resetGrid();
 
-                System.err.println(System.currentTimeMillis()-time);
+                System.err.println("time for step " + (System.currentTimeMillis()-time));
             }
         } catch (IOException e) {
             e.printStackTrace();
