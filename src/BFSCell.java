@@ -6,8 +6,8 @@ public class BFSCell {
     BFSCell parent;
 
     public BFSCell(Coordinates place, BFSCell parent){
-        this.place=place;
-        this.parent=parent;
+        this.place= new Coordinates(place.getX(), place.getY());
+        this.parent= parent;
     }
 
     public void setPlace(Coordinates newPlace){this.place=newPlace;}

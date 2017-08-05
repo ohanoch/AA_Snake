@@ -23,6 +23,7 @@ public class Coordinates {
     }
 
     public int distance(Coordinates coord2){
-        return Math.abs(this.x - coord2.getX())+Math.abs(this.y + coord2.getY());
+//        System.err.println("aaaaa" + this.x + "   "+ this.y +"   " + coord2.getX() +"   "+ coord2.getY() + "   "+ Math.abs(this.x - coord2.getX())+Math.abs(this.y - coord2.getY()));
+        return Math.abs(this.x - coord2.getX())+Math.abs(this.y - coord2.getY());
     }
 }
