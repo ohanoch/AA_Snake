@@ -6,8 +6,7 @@ import za.ac.wits.snake.DevelopmentAgent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 public class MyAgent extends DevelopmentAgent {
 
@@ -133,9 +132,11 @@ public class MyAgent extends DevelopmentAgent {
 //                System.err.println(myDistanceFromNormalApple + "   " + enemyDistanceFromNormalApple + "   " + myDistanceFromSuperApple + "   " + enemyDistanceFromSuperApple);
 
                 if (myDistanceFromSuperApple < enemyDistanceFromSuperApple){
-                    move = mySnake.move(superApple);
+//                    move = mySnake.move(superApple);
+                    move = BFS(mySnake.getHead(), superApple)[0];
                 } else if (myDistanceFromNormalApple < enemyDistanceFromNormalApple){
-                    move = mySnake.move(normalApple);
+//                    move = mySnake.move(normalApple);
+                    move = BFS(mySnake.getHead(), normalApple)[0];
                 } else {
 //                    kamikaza
 //                    if (mySnake.getLength() < Snake.allMaxLength -5){
@@ -183,7 +184,8 @@ public class MyAgent extends DevelopmentAgent {
 //                    }
                     switch (corner){
                         case 1:
-                            move = mySnake.move(new Coordinates(gridWidth/4,gridHeight/4));
+//                            move = mySnake.move(new Coordinates(gridWidth/4,gridHeight/4));
+                            move = BFS(mySnake.getHead(), new Coordinates(gridWidth/4,gridHeight/4))[0];
                             if (mySnake.getHead().distance(new Coordinates(gridWidth/4,gridHeight/4))<=4){
                                 corner=3;
                             }
@@ -195,7 +197,8 @@ public class MyAgent extends DevelopmentAgent {
 //                            }
 //                            break;
                         case 3:
-                            move = mySnake.move(new Coordinates(3*gridWidth/4,3*gridHeight/4));
+//                            move = mySnake.move(new Coordinates(3*gridWidth/4,3*gridHeight/4));
+                            move = BFS(mySnake.getHead(), new Coordinates(3*gridWidth/4,3*gridHeight/4))[0];
                             if (mySnake.getHead().distance(new Coordinates(3*gridWidth/4,3*gridHeight/4))<=4){
                                 corner=1;
                             }
@@ -210,6 +213,9 @@ public class MyAgent extends DevelopmentAgent {
                 }
 //                move = mySnake.move(new Coordinates(25,25));
 //                move = new Random().nextInt(4);
+//                long time2= System.currentTimeMillis();
+//                BFS(new Coordinates(1,1),new Coordinates(49,49));
+//                System.err.println("````````````````````````````````````````` " + (System.currentTimeMillis()-time2));
                 System.out.println(move);
                 map.resetGrid();
                 if (enemySnakes[0].getState().equals("invisible") ||
@@ -226,6 +232,99 @@ public class MyAgent extends DevelopmentAgent {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    //    does BFS and returns int array in the shape of [direction to move, amount of moves to target]
+//    directions: 1- up, 0 - down, 2 - left, 3 - right
+    public static int[] BFS(Coordinates start, Coordinates goal){
+        ArrayList<Coordinates> visited = new ArrayList<>();
+        Queue<BFSCell> q = new ArrayDeque<>();
+
+        visited.add(start);
+        BFSCell curr = new BFSCell(start,null);
+        q.add(curr);
+
+        while (q.isEmpty() == false) {
+            curr = q.remove();
+//            System.err.println(curr.getPlace().getX() + "   " + curr.getPlace().getY() + "   " + goal.getX() + "   " + goal.getY() + "   " + q.size() + "   " + visited.size());
+            if (curr.getPlace().equals(goal)) {
+                break;
+            }
+//          Up
+            Coordinates next = new Coordinates(curr.getPlace().getX(), curr.getPlace().getY() + 1);
+            boolean isVisited = listContains(visited,next);
+            if (next.getY() < Map.gridHeight && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
+                    Map.grid[next.getX()][next.getY()] == 'A' ||
+                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                q.add(new BFSCell(next,curr));
+                visited.add(new Coordinates(next.getX(),next.getY()));
+            }
+//          Down
+            next.setY( curr.getPlace().getY() - 1);
+            isVisited = listContains(visited,next);
+            if (next.getY() >= 0 && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
+                    Map.grid[next.getX()][next.getY()] == 'A' ||
+                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                q.add(new BFSCell(next,curr));
+                visited.add(new Coordinates(next.getX(),next.getY()));
+            }
+//          Left
+            next.setX(curr.getPlace().getX() - 1);
+            next.setY(curr.getPlace().getY());
+            isVisited = listContains(visited,next);
+            if (next.getX()>=0 && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
+                    Map.grid[next.getX()][next.getY()] == 'A' ||
+                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                q.add(new BFSCell(next,curr));
+                visited.add(new Coordinates(next.getX(),next.getY()));
+            }
+//          Right
+            next.setX(curr.getPlace().getX() + 1);
+            isVisited = listContains(visited,next);
+            if (next.getX()< Map.gridWidth && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
+                    Map.grid[next.getX()][next.getY()] == 'A' ||
+                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                q.add(new BFSCell(next,curr));
+                visited.add(new Coordinates(next.getX(),next.getY()));
+            }
+        }
+
+
+
+        int moveCount=0;
+        while (!curr.getParent().getPlace().equals(start)){
+            curr=curr.getParent();
+            moveCount++;
+        }
+        moveCount++;
+
+        int[] result = new int[2];
+        result[1]=moveCount;
+//        Move Right
+        if (curr.getPlace().getX()>start.getX()){
+            result[0]=3;
+            return result;
+//        Move Left
+        } else if (curr.getPlace().getX()<start.getX()){
+            result[0]=2;
+            return result;
+//        Move Up
+        } else if (curr.getPlace().getY()>start.getY()){
+            result[0]=1;
+            return result;
+//        Move Down
+        } else {
+            result[0]=0;
+            return result;
+        }
+    }
+    public static boolean listContains(ArrayList<Coordinates> l, Coordinates c){
+        for (int i=0; i<l.size(); i++){
+            if(l.get(i).equals(c)){
+                return true;
+            }
+        }
+        return false;
     }
 }
 
@@ -367,84 +466,9 @@ public class MyAgent extends DevelopmentAgent {
             e.printStackTrace();
         }
     }
+*/
 
-//    does BFS and returns int array in the shape of [direction to move, amount of moves to target]
-//    directions: 0- up, 1 - down, 2 - left, 3 - right
-    public static int[] BFS(Coordinates start, Coordinates goal){
-        LinkedList<Coordinates> visited = new LinkedList<>();
-        Queue<BFSCell> q = new LinkedList<>();
-
-        visited.add(start);
-        BFSCell curr = new BFSCell(start,null);
-        q.add(curr);
-
-        while (q.isEmpty() == false) {
-            curr = q.remove();
-//            System.err.println(curr.getPlace().getX() + "   " + curr.getPlace().getY() + "   " + goal.getX() + "   " + goal.getY() + "   " + q.size() + "   " + visited.size());
-            if (curr.getPlace().equals(goal)) {
-                break;
-            }
-//          Up
-            Coordinates next = new Coordinates(curr.getPlace().getX(), curr.getPlace().getY() + 1);
-            boolean isVisited = listContains(visited,next);
-            if (next.getY() < Map.gridHeight && !isVisited && Map.grid[next.getX()][next.getY()] == ' ') {
-                q.add(new BFSCell(next,curr));
-                visited.add(new Coordinates(next.getX(),next.getY()));
-            }
-//          Down
-            next.setY( curr.getPlace().getY() - 1);
-            isVisited = listContains(visited,next);
-            if (next.getY() >= 0 && !isVisited && Map.grid[next.getX()][next.getY()] == ' ') {
-                q.add(new BFSCell(next,curr));
-                visited.add(new Coordinates(next.getX(),next.getY()));
-            }
-//          Left
-            next.setX(curr.getPlace().getX() - 1);
-            next.setY(curr.getPlace().getY());
-            isVisited = listContains(visited,next);
-            if (next.getX()>=0 && !isVisited && Map.grid[next.getX()][next.getY()] == ' ') {
-                q.add(new BFSCell(next,curr));
-                visited.add(new Coordinates(next.getX(),next.getY()));
-            }
-//          Right
-            next.setX(curr.getPlace().getX() + 1);
-            isVisited = listContains(visited,next);
-            if (next.getX()< Map.gridWidth && !isVisited && Map.grid[next.getX()][next.getY()] == ' ') {
-                q.add(new BFSCell(next,curr));
-                visited.add(new Coordinates(next.getX(),next.getY()));
-            }
-        }
-
-
-
-        int moveCount=0;
-        while (!curr.getParent().getPlace().equals(start)){
-            curr=curr.getParent();
-            moveCount++;
-        }
-        moveCount++;
-
-        int[] result = new int[2];
-        result[1]=moveCount;
-//        Move Right
-        if (curr.getPlace().getX()>start.getX()){
-            result[0]=3;
-            return result;
-//        Move Left
-        } else if (curr.getPlace().getX()<start.getX()){
-            result[0]=2;
-            return result;
-//        Move Up
-        } else if (curr.getPlace().getY()>start.getY()){
-            result[0]=0;
-            return result;
-//        Move Down
-        } else {
-            result[0]=1;
-            return result;
-        }
-    }
-
+/*
     public static Queue<BFSCell> printQueue(Queue<BFSCell> q){
         System.err.println ("q size is " +q.size());
         Queue<BFSCell> p = new LinkedList<>();
@@ -462,13 +486,6 @@ public class MyAgent extends DevelopmentAgent {
             System.err.println(l.get(i).getX() + "   " + l.get(i).getY());
         }
     }
-    public static boolean listContains(LinkedList<Coordinates> l, Coordinates c){
-        for (int i=0; i<l.size(); i++){
-            if(l.get(i).equals(c)){
-                return true;
-            }
-        }
-        return false;
-    }
+
 }
 */
