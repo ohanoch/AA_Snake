@@ -295,6 +295,9 @@ public class MyAgent extends DevelopmentAgent {
         while (!curr.getParent().getPlace().equals(start)){
             curr=curr.getParent();
             moveCount++;
+            if(curr.getPlace().equals(start)){
+                break;
+            }
         }
         moveCount++;
 
