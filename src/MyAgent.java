@@ -44,8 +44,10 @@ public class MyAgent extends DevelopmentAgent {
                 }
 
                 //initializing apples
+                boolean isSuperApple = false;
                 Coordinates superApple = new Coordinates(Integer.parseInt(line.split(" ")[0]),Integer.parseInt(line.split(" ")[1]));
                 if (superApple.getX()!=-1){
+                    isSuperApple=true;
                     Map.grid[superApple.getX()][superApple.getY()]='S';
                 }
                 line = br.readLine();
@@ -114,24 +116,68 @@ public class MyAgent extends DevelopmentAgent {
 
                 //finished reading, calculate move:
                 //System.out.println("log calculating...");
-                int myDistanceFromSuperApple = 999;
-                if (superApple.getX()!=-1){
-                    myDistanceFromSuperApple = mySnake.getHead().distance(superApple);
-                }
-                int myDistanceFromNormalApple = mySnake.getHead().distance(normalApple);
-                int enemyDistanceFromSuperApple=999;
-                int enemyDistanceFromNormalApple=999;
-                for (int i = 0; i<nLiveEnemySnakes; i++){
-                    if (superApple.getX()!=-1 && liveEnemySnakes[i].getHead().distance(superApple)<enemyDistanceFromSuperApple){
-                        enemyDistanceFromSuperApple=liveEnemySnakes[i].getHead().distance(superApple);
+//                int myDistanceFromSuperApple = 999;
+//                if (superApple.getX()!=-1){
+//                    myDistanceFromSuperApple = mySnake.getHead().distance(superApple);
+//                }
+//                int myDistanceFromNormalApple = mySnake.getHead().distance(normalApple);
+//                int enemyDistanceFromSuperApple=999;
+//                int enemyDistanceFromNormalApple=999;
+//                for (int i = 0; i<nLiveEnemySnakes; i++){
+//                    if (superApple.getX()!=-1 && liveEnemySnakes[i].getHead().distance(superApple)<enemyDistanceFromSuperApple){
+//                        enemyDistanceFromSuperApple=liveEnemySnakes[i].getHead().distance(superApple);
+//                    }
+//                    if (liveEnemySnakes[i].getHead().distance(normalApple)<enemyDistanceFromNormalApple){
+//                        enemyDistanceFromNormalApple=liveEnemySnakes[i].getHead().distance(normalApple);
+//                    }
+//                }
+                int[] myBFS;
+                int[][] enemyBFS = new int[nLiveEnemySnakes][2];
+                int enemyDistanceFromApple=999;
+                if (isSuperApple){
+                    myBFS = BFS(mySnake.getHead(),superApple, false);
+                    for (int i=0; i<nLiveEnemySnakes; i++){
+                        enemyBFS[i]=BFS(liveEnemySnakes[i].getHead(),superApple, true);
+                        if(enemyBFS[i][1]<enemyDistanceFromApple){
+                            enemyDistanceFromApple=enemyBFS[i][1];
+                        }
                     }
-                    if (liveEnemySnakes[i].getHead().distance(normalApple)<enemyDistanceFromNormalApple){
-                        enemyDistanceFromNormalApple=liveEnemySnakes[i].getHead().distance(normalApple);
+                }else{
+                    long time2 = System.currentTimeMillis();
+                    myBFS = BFS(mySnake.getHead(),normalApple, false);
+                    System.err.print("aaaaaaaaaaaaaaa  " +(System.currentTimeMillis()-time2)+"\n");
+                    System.err.print("bbbbbbbbbbbbbbb  " + myBFS[1] +"   " +normalApple.getX() + "    " + normalApple.getY()+ "    " + mySnake.getHead().getX() +"   " +mySnake.getHead().getY()+"\n");
+                    for (int i=0; i<nLiveEnemySnakes; i++){
+                        enemyBFS[i]=BFS(liveEnemySnakes[i].getHead(),normalApple, true);
+                        if(enemyBFS[i][1]<enemyDistanceFromApple){
+                            enemyDistanceFromApple=enemyBFS[i][1];
+                        }
                     }
                 }
+                System.err.print("ccccccccccccccccccc  " + enemyDistanceFromApple + "   " + isSuperApple+ "   "+enemyBFS[0][1]+"\n");
+
 //                System.err.println(myDistanceFromNormalApple + "   " + enemyDistanceFromNormalApple + "   " + myDistanceFromSuperApple + "   " + enemyDistanceFromSuperApple);
 
-                if (myDistanceFromSuperApple < enemyDistanceFromSuperApple){
+                if (myBFS[1]<enemyDistanceFromApple){
+                    move=myBFS[0];
+                }else{
+                    switch (corner){
+                        case 1:
+                            move = BFS(mySnake.getHead(), new Coordinates(gridWidth/4,gridHeight/4), false)[0];
+                            if (mySnake.getHead().distance(new Coordinates(gridWidth/4,gridHeight/4))<=4){
+                                corner=3;
+                            }
+                            break;
+                        case 3:
+                            move = BFS(mySnake.getHead(), new Coordinates(3*gridWidth/4,3*gridHeight/4),false)[0];
+                            if (mySnake.getHead().distance(new Coordinates(3*gridWidth/4,3*gridHeight/4))<=4){
+                                corner=1;
+                            }
+                            break;
+                    }
+                }
+
+/*                if (myBFS[1] < enemyDistanceFromSuperApple){
 //                    move = mySnake.move(superApple);
                     move = BFS(mySnake.getHead(), superApple)[0];
                 } else if (myDistanceFromNormalApple < enemyDistanceFromNormalApple){
@@ -211,6 +257,7 @@ public class MyAgent extends DevelopmentAgent {
 //                            break;
                     }
                 }
+*/
 //                move = mySnake.move(new Coordinates(25,25));
 //                move = new Random().nextInt(4);
 //                long time2= System.currentTimeMillis();
@@ -236,7 +283,7 @@ public class MyAgent extends DevelopmentAgent {
 
     //    does BFS and returns int array in the shape of [direction to move, amount of moves to target]
 //    directions: 1- up, 0 - down, 2 - left, 3 - right
-    public static int[] BFS(Coordinates start, Coordinates goal){
+    public static int[] BFS(Coordinates start, Coordinates goal, boolean isEnemy){
         ArrayList<Coordinates> visited = new ArrayList<>();
         Queue<BFSCell> q = new ArrayDeque<>();
 
@@ -244,6 +291,7 @@ public class MyAgent extends DevelopmentAgent {
         BFSCell curr = new BFSCell(start,null);
         q.add(curr);
 
+        int count=0;
         while (q.isEmpty() == false) {
             curr = q.remove();
 //            System.err.println(curr.getPlace().getX() + "   " + curr.getPlace().getY() + "   " + goal.getX() + "   " + goal.getY() + "   " + q.size() + "   " + visited.size());
@@ -255,7 +303,8 @@ public class MyAgent extends DevelopmentAgent {
             boolean isVisited = listContains(visited,next);
             if (next.getY() < Map.gridHeight && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
                     Map.grid[next.getX()][next.getY()] == 'A' ||
-                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                    Map.grid[next.getX()][next.getY()] == 'S' ||
+                    (isEnemy && Map.grid[next.getX()][next.getY()] == '*'))) {
                 q.add(new BFSCell(next,curr));
                 visited.add(new Coordinates(next.getX(),next.getY()));
             }
@@ -264,7 +313,8 @@ public class MyAgent extends DevelopmentAgent {
             isVisited = listContains(visited,next);
             if (next.getY() >= 0 && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
                     Map.grid[next.getX()][next.getY()] == 'A' ||
-                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                    Map.grid[next.getX()][next.getY()] == 'S' ||
+                    (isEnemy && Map.grid[next.getX()][next.getY()] == '*'))) {
                 q.add(new BFSCell(next,curr));
                 visited.add(new Coordinates(next.getX(),next.getY()));
             }
@@ -274,7 +324,8 @@ public class MyAgent extends DevelopmentAgent {
             isVisited = listContains(visited,next);
             if (next.getX()>=0 && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
                     Map.grid[next.getX()][next.getY()] == 'A' ||
-                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                    Map.grid[next.getX()][next.getY()] == 'S' ||
+                    (isEnemy && Map.grid[next.getX()][next.getY()] == '*'))) {
                 q.add(new BFSCell(next,curr));
                 visited.add(new Coordinates(next.getX(),next.getY()));
             }
@@ -283,14 +334,17 @@ public class MyAgent extends DevelopmentAgent {
             isVisited = listContains(visited,next);
             if (next.getX()< Map.gridWidth && !isVisited && (Map.grid[next.getX()][next.getY()] == ' ' ||
                     Map.grid[next.getX()][next.getY()] == 'A' ||
-                    Map.grid[next.getX()][next.getY()] == 'S')) {
+                    Map.grid[next.getX()][next.getY()] == 'S' ||
+                    (isEnemy && Map.grid[next.getX()][next.getY()] == '*'))) {
                 q.add(new BFSCell(next,curr));
                 visited.add(new Coordinates(next.getX(),next.getY()));
             }
-        }
+            count++;
 
+        }
+        System.err.print("asddasdasdsad   "+count + "\n");
         //if can't reach apple
-        if(q.isEmpty() || !listContains(visited,goal)){
+        if(!listContains(visited,goal)){
             int[] result = new int[2];
             result[1]=999;
             //move up
