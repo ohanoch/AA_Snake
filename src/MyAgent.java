@@ -289,37 +289,61 @@ public class MyAgent extends DevelopmentAgent {
             }
         }
 
+        //if can't reach apple
+        if(q.isEmpty() || !listContains(visited,goal)){
+            int[] result = new int[2];
+            result[1]=999;
+            //move up
+            if (start.getY()+1<Map.gridHeight){
+                result[0]=1;
+                return result;
+            }
+            //move down
+            if (start.getY()-1>=0){
+                result[0]=0;
+                return result;
+            }
+            //move left
+            if (start.getX()-1>=0){
+                result[0]=2;
+                return result;
+            }
+            //move right
+            if (start.getX()+1>=Map.gridWidth){
+                result[0]=3;
+                return result;
+            }
 
+        }else {
 
-        int moveCount=0;
-        while (!curr.getParent().getPlace().equals(start)){
-            curr=curr.getParent();
+            int moveCount = 0;
+            while (!curr.getParent().getPlace().equals(start)) {
+                curr = curr.getParent();
+                moveCount++;
+            }
             moveCount++;
-            if(curr.getPlace().equals(start)){
-                break;
+
+            int[] result = new int[2];
+            result[1] = moveCount;
+            //        Move Right
+            if (curr.getPlace().getX() > start.getX()) {
+                result[0] = 3;
+                return result;
+                //        Move Left
+            } else if (curr.getPlace().getX() < start.getX()) {
+                result[0] = 2;
+                return result;
+                //        Move Up
+            } else if (curr.getPlace().getY() > start.getY()) {
+                result[0] = 1;
+                return result;
+                //        Move Down
+            } else {
+                result[0] = 0;
+                return result;
             }
         }
-        moveCount++;
-
-        int[] result = new int[2];
-        result[1]=moveCount;
-//        Move Right
-        if (curr.getPlace().getX()>start.getX()){
-            result[0]=3;
-            return result;
-//        Move Left
-        } else if (curr.getPlace().getX()<start.getX()){
-            result[0]=2;
-            return result;
-//        Move Up
-        } else if (curr.getPlace().getY()>start.getY()){
-            result[0]=1;
-            return result;
-//        Move Down
-        } else {
-            result[0]=0;
-            return result;
-        }
+        return new int[2];
     }
     public static boolean listContains(ArrayList<Coordinates> l, Coordinates c){
         for (int i=0; i<l.size(); i++){
