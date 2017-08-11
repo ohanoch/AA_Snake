@@ -20,7 +20,7 @@ public class Snake {
         this.kills = Integer.parseInt(snakeData[2]);
         if (state.equals("invisible")){
             this.invisibiltyTime = Integer.parseInt(snakeData[3]);
-            setBody(Arrays.copyOfRange(snakeData, 4, snakeData.length));
+            setBody(Arrays.copyOfRange(snakeData, 5, snakeData.length));
         } else {
             this.invisibiltyTime = 0;
             if (state.equals("alive")){
