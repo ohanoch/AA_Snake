@@ -290,7 +290,7 @@ public class MyAgent extends DevelopmentAgent {
         }
 
         //if can't reach apple
-        if(q.isEmpty() || !listContains(visited,goal)){
+/*        if(q.isEmpty() || !listContains(visited,goal)){
             int[] result = new int[2];
             result[1]=999;
             //move up
@@ -315,9 +315,13 @@ public class MyAgent extends DevelopmentAgent {
             }
 
         }else {
-
+*/
             int moveCount = 0;
-            while (!curr.getParent().getPlace().equals(start)) {
+            boolean flag=true;
+            if (curr.getPlace().equals(start)){
+                flag = false;
+            }
+            while (flag && !curr.getParent().getPlace().equals(start)) {
                 curr = curr.getParent();
                 moveCount++;
             }
@@ -343,8 +347,8 @@ public class MyAgent extends DevelopmentAgent {
                 return result;
             }
         }
-        return new int[2];
-    }
+      //  return new int[2];
+    //}
     public static boolean listContains(ArrayList<Coordinates> l, Coordinates c){
         for (int i=0; i<l.size(); i++){
             if(l.get(i).equals(c)){
