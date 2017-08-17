@@ -16,10 +16,12 @@ def findWinner(snakes):
             maxIndex = snakeNum
     return maxIndex
 
-def drawLine(start, end, isWinner):
+def drawLine(start, end, isWinner, isInvisible, isHead):
     brush = 1
     if isWinner:
         brush = 2
+    elif isInvisible:
+        brush=0
 
     start = tuple(map(int, start.split(',')))
     end = tuple(map(int, end.split(',')))
@@ -37,6 +39,11 @@ def drawLine(start, end, isWinner):
         else:
             for i in range(end[0],start[0]):
                 board[i][start[1]]=brush
+    if (isHead):
+        if (isWinner):
+            board[start[0]][start[1]]=4
+        else:
+            board[start[0]][start[1]] = 3
 
 def drawSnakes(snakes):
     winnerNum=findWinner(snakes)
@@ -51,8 +58,12 @@ def drawSnakes(snakes):
         else:
             isWinner=False
 
-        for i in range(len(snakes[snakeNum])-6-isInvisible -1):
-            drawLine(snakes[snakeNum][6+isInvisible+i],snakes[snakeNum][6+isInvisible+i+1], isWinner)
+        for i in range(len(snakes[snakeNum])-6-2*isInvisible -1):
+            if (i==0):
+                isHead=True
+            else:
+                isHead=False
+            drawLine(snakes[snakeNum][6+2*isInvisible+i],snakes[snakeNum][6+2*isInvisible+i+1], isWinner, isInvisible, isHead)
 
 def printBoard():
     for i in range(BOARD_WIDTH):
@@ -91,7 +102,7 @@ if __name__ == "__main__":
 
         for currState in range(0,1):#len(data["states"])):
             if data["states"][currState]["globalIndex"] > currGlobalIndex:
-                board = [[0 for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)]
+                board = np.array( [[0 for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)])
                 currGlobalIndex = data["states"][currState]["globalIndex"]
                 splitData = data["states"][currState]["state"].split('\n')
 
@@ -108,6 +119,12 @@ if __name__ == "__main__":
                 allBoards.append(board)
                 if currState != 0:
                     moves.append(findMove(lastSnakes,snakes, lastWinner))
+                board = board.transpose()
+                allBoards.append(board)
+                if currState != 0:
+                    moves.append(findMove(lastSnakes,snakes, lastWinner))
+
+
                 lastSnakes=snakes
                 lastWinner = findWinner(snakes);
 
