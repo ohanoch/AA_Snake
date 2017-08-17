@@ -16,28 +16,29 @@ def findWinner(snakes):
             maxIndex = snakeNum
     return maxIndex
 
-def drawLine(start, end, isWinner, isInvisible, isHead):
+#def drawLine(start, end, isWinner, isInvisible, isHead):
+def drawLine(start, end, isWinner, isHead):
     brush = 1
     if isWinner:
         brush = 2
-    elif isInvisible:
-        brush=0
+#    elif isInvisible:
+#        brush=0
 
     start = tuple(map(int, start.split(',')))
     end = tuple(map(int, end.split(',')))
     if (start[0]==end[0]):
         if (start[1]<end[1]):
-            for i in range(start[1],end[1]):
+            for i in range(start[1],end[1]+1):
                 board[start[0]][i]=brush
         else:
-            for i in range(end[1],start[1]):
+            for i in range(end[1],start[1]+1):
                 board[start[0]][i]=brush
     else:
         if (start[0]<end[0]):
-            for i in range(start[0],end[0]):
+            for i in range(start[0],end[0]+1):
                 board[i][start[1]]=brush
         else:
-            for i in range(end[0],start[0]):
+            for i in range(end[0],start[0]+1):
                 board[i][start[1]]=brush
     if (isHead):
         if (isWinner):
@@ -49,21 +50,23 @@ def drawSnakes(snakes):
     winnerNum=findWinner(snakes)
     for snakeNum in range(len(snakes)):
         if snakes[snakeNum][3]=="invisible":
-            isInvisible=True
-        else:
-            isInvisible=False
+            break;
+#            isInvisible=True
+#        else:
+#            isInvisible=False
 
         if winnerNum==snakeNum:
             isWinner=True
         else:
             isWinner=False
 
-        for i in range(len(snakes[snakeNum])-6-2*isInvisible -1):
+        for i in range(len(snakes[snakeNum])-6-1):#-2*isInvisible -1):
             if (i==0):
                 isHead=True
             else:
                 isHead=False
-            drawLine(snakes[snakeNum][6+2*isInvisible+i],snakes[snakeNum][6+2*isInvisible+i+1], isWinner, isInvisible, isHead)
+            drawLine(snakes[snakeNum][6+i],snakes[snakeNum][6+i+1], isWinner, isHead)
+#            drawLine(snakes[snakeNum][6+2*isInvisible+i],snakes[snakeNum][6+2*isInvisible+i+1], isWinner, isInvisible, isHead)
 
 def printBoard():
     for i in range(BOARD_WIDTH):
@@ -80,9 +83,9 @@ def findMove(lastSnakes, currSnakes, lastWinner):
         isCurrInvisible=True
     else:
         isCurrInvisible = False
-
-    lastHead = tuple(map(int, lastSnakes[6+isCurrInvisible].split(',')))
-    currHead = tuple(map(int, currSnakes[6+isCurrInvisible].split(',')))
+    
+    lastHead = tuple(map(int, lastSnakes[lastWinner][6+isCurrInvisible].split(',')))
+    currHead = tuple(map(int, currSnakes[lastWinner][6+isCurrInvisible].split(',')))
 
     if lastHead[0]==currHead[0]:
         if lastHead[1] > currHead[1]:   #moved down
@@ -100,7 +103,7 @@ if __name__ == "__main__":
         with open('./snake_json_files/'+ str(fileNumber) + '.json') as data_file:
             data = json.load(data_file)
 
-        for currState in range(0,1):#len(data["states"])):
+        for currState in range(0,len(data["states"])):
             if data["states"][currState]["globalIndex"] > currGlobalIndex:
                 board = np.array( [[0 for i in range(BOARD_WIDTH)] for j in range(BOARD_HEIGHT)])
                 currGlobalIndex = data["states"][currState]["globalIndex"]
@@ -108,12 +111,14 @@ if __name__ == "__main__":
 
                 superApple = tuple(map(int, splitData[0].split(' ')))
                 if superApple[0] != -1:
-                    board[superApple[0]][superApple[1]]=3
+                    board[superApple[0]][superApple[1]]=5
                 normalApple = tuple(map(int, splitData[1].split(' ')))
-                board[normalApple[0]][normalApple[1]] = 4
+                board[normalApple[0]][normalApple[1]] = 6
 
                 snakes = [tuple(splitData[i].split(' ')) for i in range (2,6)]
-
+		
+		if (snakes[findWinner(snakes)][3]=='dead'):
+			break;
                 drawSnakes(snakes)
 
                 allBoards.append(board)
